@@ -2,6 +2,7 @@
 """Recipe supervisor"""
 
 import os
+import re
 import zc.recipe.egg
 
 class Recipe(object):
@@ -50,27 +51,31 @@ class Recipe(object):
                                               serverurl = serverurl,
                                              )
         #programs
-        programs = [p for p in self.options.get('programs', '').split(os.linesep) if p]
-        for program in programs:
-            redirect_stderr = 'false'
-            line = program.split() 
-            ln = len(line)
-            if ln == 3:
-                priority, process_name, command = line
-                directory = os.path.dirname(command)
-            elif ln == 4:
-                priority, process_name, command, directory = line
-            elif ln == 5:
-                priority, process_name, command, directory, redirect_stderr = line
-            else:
-                raise ValueError, "collective.recipe.supervisor: wrong options number in: %s" % program
+        programs = [p for p in self.options.get('programs', '').splitlines() if p]
+        pattern = re.compile("(?P<priority>\d+)"
+                             "\s+"
+                             "(?P<processname>[^\s]+)"
+                             "\s+"
+                             "(?P<command>[^\s]+)"
+                             "(\s+\[(?P<args>(?!true|false)[^\]]+)\])?"
+                             "(\s+(?P<directory>(?!true|false)[^\s]+))?"
+                             "(\s+(?P<redirect>(true|false)))?")
 
-            config_data += program_template % dict(program = process_name,
-                                                   command = command,
-                                                   priority = priority,
-                                                   redirect_stderr = redirect_stderr,
-                                                   directory = directory
-                                                  )
+        for program in programs:
+            match =  pattern.match(program)
+            if not match:
+                raise ValueError, "Program line incorrect: %s" % program
+
+            parts = match.groupdict()
+
+            config_data += program_template % \
+                           dict(program = parts.get('processname'),
+                                command = parts.get('command'),
+                                priority = parts.get('priority'),
+                                redirect_stderr = parts.get('redirect') or 'false',
+                                directory = parts.get('directory') or os.path.dirname(parts.get('command')),
+                                args = parts.get('args') or '',
+                           )
 
         conf_file = os.path.join(self.buildout['buildout']['bin-directory'], 'supervisord.conf')
         if self.options.get('supervisord-conf', None) is not None:
@@ -121,7 +126,7 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 program_template = """
 [program:%(program)s]
-command = %(command)s
+command = %(command)s %(args)s
 process_name = %(program)s
 directory = %(directory)s
 priority = %(priority)s

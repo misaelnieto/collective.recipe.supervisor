@@ -1,4 +1,16 @@
-0.1.0 (2008-04-21)
-==================
+
+0.2 (2008-04-23)
+================
+
+ - Make possible to pass arguments to the command so one can use ctl scripts
+   with supervisor with arguments like 'fg' for zope instances or --no-detach 
+   or something similar for other programs
+   [mustapha]
+
+ - updated tests
+   [mustapha]
+
+0.1 (2008-04-21)
+================
 
  - Created recipe with ZopeSkel [Mustapha Benali].

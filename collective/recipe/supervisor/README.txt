@@ -58,11 +58,17 @@ programs
    A list of programs you want the supervisord to control. One per line. 
    The format of a line is as follow:
    
-       priority process_name executable [[directory] [[redirect_stderr]]]
+       priority process_name command [[args] [directory] [[redirect_stderr]]]
    
+   The [args] is any number of arguments you want to pass to the ``command``
+   It has to be given between [] (ie.: [-v fg]). See examples below.
    If not given the redirect_stderr defaults to false.
    If not given the directory option defaults to the directory containing the
-   executable. See below for an example.
+   the command.
+
+   In most cases you will only need to give the 4 first parts:
+
+   pririty process_name command [[args]]
 
 
 
@@ -77,11 +83,10 @@ We'll start by creating a buildout that uses the recipe::
     ... parts = supervisor
     ...
     ... [zeo]
-    ... location =
+    ... location = /a/b/c
     ... [instance1]
-    ... location =
+    ... location = /e/f
     ... [instance2]
-    ... location= 
     ...
     ... [supervisor]
     ... recipe = collective.recipe.supervisor
@@ -90,10 +95,13 @@ We'll start by creating a buildout that uses the recipe::
     ... password = secret
     ... serverurl = http://supervisor.mustap.com
     ... programs =
-    ...       10 zeo ${buildout:bin-directory}/zeo ${zeo:location}
-    ...       20 instance1 ${buildout:bin-directory}/instance1 ${instance1:location} true
-    ...       30 instance2 ${buildout:bin-directory}/instance2
-    ...       40 maildrophost ${buildout:bin-directory}/maildropctl
+    ...       10 zeo ${buildout:bin-directory}/zeo [fg] ${zeo:location}
+    ...       20 instance1 ${buildout:bin-directory}/instance1 [fg] ${instance1:location} true
+    ...       30 instance2 ${buildout:bin-directory}/instance2 [fg] true
+    ...       40 maildrophost ${buildout:bin-directory}/maildropctl true
+    ...       50 other ${buildout:bin-directory}/other /tmp
+    ...       60 other2 ${buildout:bin-directory}/other2 /tmp2 true
+    ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true
     ... """)
 
 
@@ -140,27 +148,27 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:zeo]
-    command = /sample-buildout/bin/zeo
+    command = /sample-buildout/bin/zeo fg
     process_name = zeo
-    directory = /sample-buildout/bin
+    directory = /a/b/c
     priority = 10
     redirect_stderr = false
     <BLANKLINE>
     <BLANKLINE>
     [program:instance1]
-    command = /sample-buildout/bin/instance1
+    command = /sample-buildout/bin/instance1 fg
     process_name = instance1
-    directory = true
+    directory = /e/f
     priority = 20
-    redirect_stderr = false
+    redirect_stderr = true
     <BLANKLINE>
     <BLANKLINE>
     [program:instance2]
-    command = /sample-buildout/bin/instance2
+    command = /sample-buildout/bin/instance2 fg
     process_name = instance2
     directory = /sample-buildout/bin
     priority = 30
-    redirect_stderr = false
+    redirect_stderr = true
     <BLANKLINE>
     <BLANKLINE>
     [program:maildrophost]
@@ -168,8 +176,33 @@ now, get a look to the generated supervisord.conf file::
     process_name = maildrophost
     directory = /sample-buildout/bin
     priority = 40
+    redirect_stderr = true
+    <BLANKLINE>
+    <BLANKLINE>
+    [program:other]
+    command = /sample-buildout/bin/other
+    process_name = other
+    directory = /tmp
+    priority = 50
     redirect_stderr = false
     <BLANKLINE>
+    <BLANKLINE>
+    [program:other2]
+    command = /sample-buildout/bin/other2
+    process_name = other2
+    directory = /tmp2
+    priority = 60
+    redirect_stderr = true
+    <BLANKLINE>
+    <BLANKLINE>
+    [program:other3]
+    command = /sample-buildout/bin/other3 -n -h -v --no-detach
+    process_name = other3
+    directory = /tmp3
+    priority = 70
+    redirect_stderr = true
+    <BLANKLINE>
+
 
 and if we look to generated supervisord script we will see that the 
 configuration file is given as argument with the '-c' option::
