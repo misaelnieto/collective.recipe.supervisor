@@ -68,7 +68,7 @@ programs
 
    In most cases you will only need to give the 4 first parts:
 
-   pririty process_name command [[args]]
+       priority process_name command [[args]]
 
 
 
