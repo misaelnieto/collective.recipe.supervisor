@@ -99,7 +99,9 @@ class Recipe(object):
                                       self.name, 
                                       {'eggs': 'supervisor', 
                                        'scripts': 'supervisorctl=supervisorctl',
-                                       'initialization': 'import sys; sys.argv.extend(%s)' % init,}
+                                       'initialization': 'import sys; sys.argv[1:1] = %s' % init,
+                                       'arguments': 'sys.argv[1:]'
+                                      }
                                      )
 
         return list(dscript.install()) + list(ctlscript.install()) + [conf_file]

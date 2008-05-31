@@ -2,6 +2,9 @@
 0.3 (unreleased)
 ================
 
+ - Make it possible to pass in arguments to the control script.
+   [hannosch]
+
  - Put all specified options, like server url and username into the generated
    control script. This allows to run it as is.
    [hannosch]
