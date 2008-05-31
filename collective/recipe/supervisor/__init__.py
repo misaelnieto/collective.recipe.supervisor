@@ -85,14 +85,24 @@ class Recipe(object):
 
         open(conf_file, 'w').write(config_data)
 
-        script = zc.recipe.egg.Egg(self.buildout, 
-                                   self.name, 
-                                   {'eggs': 'supervisor', 
-                                    'scripts': 'supervisord=supervisord supervisorctl=supervisorctl',
-                                    'initialization': 'import sys; sys.argv.extend(["-c","%s"])' % conf_file,}
-                                  )
+        dscript = zc.recipe.egg.Egg(self.buildout, 
+                                    self.name, 
+                                    {'eggs': 'supervisor', 
+                                     'scripts': 'supervisord=supervisord',
+                                     'initialization': 'import sys; sys.argv.extend(["-c","%s"])' % conf_file,}
+                                   )
 
-        return list(script.install()) + [conf_file]
+        # Put all options into the ctl script
+        init = '["-c","%s","-u","%s","-p","%s","-s","%s"]' % (conf_file, user, password, serverurl)
+
+        ctlscript = zc.recipe.egg.Egg(self.buildout, 
+                                      self.name, 
+                                      {'eggs': 'supervisor', 
+                                       'scripts': 'supervisorctl=supervisorctl',
+                                       'initialization': 'import sys; sys.argv.extend(%s)' % init,}
+                                     )
+
+        return list(dscript.install()) + list(ctlscript.install()) + [conf_file]
 
     def update(self):
         """Updater"""

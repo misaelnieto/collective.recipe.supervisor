@@ -1,4 +1,11 @@
 
+0.3 (unreleased)
+================
+
+ - Put all specified options, like server url and username into the generated
+   control script. This allows to run it as is.
+   [hannosch]
+
 0.2 (2008-04-23)
 ================
 
