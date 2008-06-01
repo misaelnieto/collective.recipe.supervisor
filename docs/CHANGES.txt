@@ -8,10 +8,10 @@
 ================
 
  - Updated docs and tests
- [mustapha]
+   [mustapha]
  
  - pep8 cosmetics
- [mustapha]
+   [mustapha]
 
  - Make it possible to pass in arguments to the control script.
    [hannosch]
