@@ -1,5 +1,10 @@
+0.4 (unreleased)
+================
 
-0.3 (unreleased)
+  -
+
+
+0.3 (2008-06-01)
 ================
 
  - Updated docs and tests
