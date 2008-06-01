@@ -231,3 +231,18 @@ configuration file is given as argument with the '-c' option::
     if __name__ == '__main__':
         supervisor.supervisord.main()
 
+The control script contains all specified options, like server url and 
+username. This allows to run it as is::
+
+    >>> cat('bin', 'supervisorctl')
+    ...
+    <BLANKLINE>
+    ...
+    <BLANKLINE>
+    import sys; sys.argv[1:1] = ["-c","/sample-buildout/bin/supervisord.conf","-u","mustapha","-p","secret","-s","http://supervisor.mustap.com"]
+    <BLANKLINE>
+    import supervisor.supervisorctl
+    <BLANKLINE>
+    if __name__ == '__main__':
+        supervisor.supervisorctl.main(sys.argv[1:])
+
