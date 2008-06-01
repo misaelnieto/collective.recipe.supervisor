@@ -20,13 +20,17 @@ use the -c option to specify an alternate configuration file.
 $Id$
 """
 
-import os, shutil, sys, tempfile, urllib2
+import os
+import shutil
+import sys
+import tempfile
+import urllib2
 
 tmpeggs = tempfile.mkdtemp()
 
 ez = {}
-exec urllib2.urlopen('http://peak.telecommunity.com/dist/ez_setup.py'
-                     ).read() in ez
+ez_setup_url = 'http://peak.telecommunity.com/dist/ez_setup.py'
+exec urllib2.urlopen(ez_setup_url).read() in ez
 ez['use_setuptools'](to_dir=tmpeggs, download_delay=0)
 
 import pkg_resources
@@ -41,8 +45,7 @@ assert os.spawnle(
     '-c', cmd, '-mqNxd', tmpeggs, 'zc.buildout',
     dict(os.environ,
          PYTHONPATH=
-         ws.find(pkg_resources.Requirement.parse('setuptools')).location
-         ),
+         ws.find(pkg_resources.Requirement.parse('setuptools')).location),
     ) == 0
 
 ws.add_entry(tmpeggs)

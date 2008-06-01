@@ -81,12 +81,13 @@ We'll start by creating a buildout that uses the recipe::
     ... """
     ... [buildout]
     ... parts = supervisor
-    ...
+    ... index = http://pypi.python.org/simple
     ... [zeo]
     ... location = /a/b/c
     ... [instance1]
     ... location = /e/f
     ... [instance2]
+    ... location = /g/h
     ...
     ... [supervisor]
     ... recipe = collective.recipe.supervisor
@@ -95,24 +96,35 @@ We'll start by creating a buildout that uses the recipe::
     ... password = secret
     ... serverurl = http://supervisor.mustap.com
     ... programs =
-    ...       10 zeo ${buildout:bin-directory}/zeo [fg] ${zeo:location}
-    ...       20 instance1 ${buildout:bin-directory}/instance1 [fg] ${instance1:location} true
-    ...       30 instance2 ${buildout:bin-directory}/instance2 [fg] true
+    ...       10 zeo ${zeo:location}/bin/runzeo ${zeo:location}
+    ...       20 instance1 ${instance1:location}/bin/runzope ${instance1:location} true
+    ...       30 instance2 ${instance2:location}/bin/runzope true
     ...       40 maildrophost ${buildout:bin-directory}/maildropctl true
-    ...       50 other ${buildout:bin-directory}/other /tmp
-    ...       60 other2 ${buildout:bin-directory}/other2 /tmp2 true
+    ...       50 other ${buildout:bin-directory}/other [-n 100] /tmp
+    ...       60 other2 ${buildout:bin-directory}/other2 [-n 100] true
     ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true
     ... """)
 
+Chris Mc Donough said::
+
+     Note however that the "instance" script Plone uses to start Zope when
+     passed "fg" appears to use os.system, so the process that supervisor is 
+     controlling isnt actually Plone, it's the controller script. This means 
+     that "stop" and "start" tend to not do what you want. It's far better to 
+     use "runzope", which actually execs the Python process which becomes Zope
+     See also 
+     http://supervisord.org/manual/current/subprocesses.html#nondaemonizing_of_subprocesses
 
 Running the buildout gives us::
 
     >>> print system(buildout)
+    Getting distribution for ...
+    ...
     Installing supervisor.
     Getting distribution for 'supervisor'.
     ...
-    Generated script '/sample-buildout/bin/supervisorctl'.
     Generated script '/sample-buildout/bin/supervisord'.
+    Generated script '/sample-buildout/bin/supervisorctl'.
     <BLANKLINE>
 
 You can now just run the supervisord like this::
@@ -144,11 +156,11 @@ now, get a look to the generated supervisord.conf file::
     serverurl = http://supervisor.mustap.com
     <BLANKLINE>
     [rpcinterface:supervisor]
-    supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+    supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
     <BLANKLINE>
     <BLANKLINE>
     [program:zeo]
-    command = /sample-buildout/bin/zeo fg
+    command = /a/b/c/bin/runzeo 
     process_name = zeo
     directory = /a/b/c
     priority = 10
@@ -156,7 +168,7 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:instance1]
-    command = /sample-buildout/bin/instance1 fg
+    command = /e/f/bin/runzope
     process_name = instance1
     directory = /e/f
     priority = 20
@@ -164,9 +176,9 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:instance2]
-    command = /sample-buildout/bin/instance2 fg
+    command = /g/h/bin/runzope
     process_name = instance2
-    directory = /sample-buildout/bin
+    directory = /g/h/bin
     priority = 30
     redirect_stderr = true
     <BLANKLINE>
@@ -180,7 +192,7 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:other]
-    command = /sample-buildout/bin/other
+    command = /sample-buildout/bin/other -n 100
     process_name = other
     directory = /tmp
     priority = 50
@@ -188,9 +200,9 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:other2]
-    command = /sample-buildout/bin/other2
+    command = /sample-buildout/bin/other2 -n 100
     process_name = other2
-    directory = /tmp2
+    directory = /sample-buildout/bin
     priority = 60
     redirect_stderr = true
     <BLANKLINE>

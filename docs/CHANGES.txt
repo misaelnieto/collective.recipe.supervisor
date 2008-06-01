@@ -2,6 +2,12 @@
 0.3 (unreleased)
 ================
 
+ - Updated docs and tests
+ [mustapha]
+ 
+ - pep8 cosmetics
+ [mustapha]
+
  - Make it possible to pass in arguments to the control script.
    [hannosch]
 

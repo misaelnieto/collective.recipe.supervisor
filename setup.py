@@ -2,8 +2,10 @@
 """
 This module contains the tool of collective.recipe.supervisor
 """
+
 import os
 from setuptools import setup, find_packages
+
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
@@ -15,7 +17,7 @@ long_description = (
     + '\n' +
     'Change history\n'
     '**************\n'
-    + '\n' + 
+    + '\n' +
     read('docs', 'CHANGES.txt')
     + '\n' +
     'Detailed Documentation\n'
@@ -23,18 +25,18 @@ long_description = (
     + '\n' +
     read('collective', 'recipe', 'supervisor', 'README.txt')
     + '\n' +
-    'Contributors\n' 
+    'Contributors\n'
     '************\n'
     + '\n' +
     read('docs', 'CONTRIBUTORS.txt')
     + '\n' +
     'Download\n'
-    '********\n'
-    )
+    '********\n')
+
 entry_point = 'collective.recipe.supervisor:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 
-tests_require=['zope.testing', 'zc.buildout']
+tests_require = ['zope.testing']
 
 setup(name='collective.recipe.supervisor',
       version=version,
@@ -60,7 +62,6 @@ setup(name='collective.recipe.supervisor',
       install_requires=['setuptools',
                         'zc.buildout',
                         'zc.recipe.egg',
-                        'supervisor',
                         # -*- Extra requirements: -*-
                         ],
       tests_require=tests_require,

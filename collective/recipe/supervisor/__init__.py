@@ -5,6 +5,7 @@ import os
 import re
 import zc.recipe.egg
 
+
 class Recipe(object):
     """zc.buildout recipe"""
 
@@ -14,21 +15,20 @@ class Recipe(object):
     def install(self):
         """Installer"""
         # XXX Implement recipe functionality here
-        
         # Return files that were created by the recipe. The buildout
         # will remove all returned files upon reinstall.
 
-        #inet_http_server   
+        #inet_http_server
         port = self.options.get('port', '127.0.0.1:9001')
         user = self.options.get('user', '')
         password = self.options.get('password', '')
         #supervisord
-        buildout_dir =  self.buildout['buildout']['directory']
-        logfile = self.options.get('logfile', os.path.join(buildout_dir, 
-                                                           'var', 
-                                                           'log', 
+        buildout_dir = self.buildout['buildout']['directory']
+        logfile = self.options.get('logfile', os.path.join(buildout_dir,
+                                                           'var',
+                                                           'log',
                                                            'supervisord.log'))
-        pidfile = self.options.get('pidfile', os.path.join(buildout_dir, 
+        pidfile = self.options.get('pidfile', os.path.join(buildout_dir,
                                                            'var',
                                                            'supervisord.pid'))
 
@@ -39,19 +39,20 @@ class Recipe(object):
         #supervisorctl
         serverurl = self.options.get('serverurl', 'http://localhost:9001')
 
-        config_data = config_template % dict (port = port,
-                                              user = user,
-                                              password = password,
-                                              logfile = logfile,
-                                              pidfile = pidfile,
-                                              logfile_maxbytes = logfile_maxbytes,
-                                              logfile_backups = logfile_backups,
-                                              loglevel = loglevel,
-                                              nodaemon = nodaemon,
-                                              serverurl = serverurl,
-                                             )
+        config_data = config_template % dict(port = port,
+                                           user = user,
+                                           password = password,
+                                           logfile = logfile,
+                                           pidfile = pidfile,
+                                           logfile_maxbytes = logfile_maxbytes,
+                                           logfile_backups = logfile_backups,
+                                           loglevel = loglevel,
+                                           nodaemon = nodaemon,
+                                           serverurl = serverurl,
+                                         )
         #programs
-        programs = [p for p in self.options.get('programs', '').splitlines() if p]
+        programs = [p for p in self.options.get('programs', '').splitlines()
+                            if p]
         pattern = re.compile("(?P<priority>\d+)"
                              "\s+"
                              "(?P<processname>[^\s]+)"
@@ -62,9 +63,9 @@ class Recipe(object):
                              "(\s+(?P<redirect>(true|false)))?")
 
         for program in programs:
-            match =  pattern.match(program)
+            match = pattern.match(program)
             if not match:
-                raise ValueError, "Program line incorrect: %s" % program
+                raise(ValueError, "Program line incorrect: %s" % program)
 
             parts = match.groupdict()
 
@@ -72,12 +73,15 @@ class Recipe(object):
                            dict(program = parts.get('processname'),
                                 command = parts.get('command'),
                                 priority = parts.get('priority'),
-                                redirect_stderr = parts.get('redirect') or 'false',
-                                directory = parts.get('directory') or os.path.dirname(parts.get('command')),
+                                redirect_stderr = parts.get('redirect') or \
+                                                  'false',
+                                directory = parts.get('directory') or \
+                                         os.path.dirname(parts.get('command')),
                                 args = parts.get('args') or '',
                            )
 
-        conf_file = os.path.join(self.buildout['buildout']['bin-directory'], 'supervisord.conf')
+        conf_file = os.path.join(self.buildout['buildout']['bin-directory'],
+                                 'supervisord.conf')
         if self.options.get('supervisord-conf', None) is not None:
             conf_file = self.options.get('supervisord-conf')
             if not os.path.exists(os.path.dirname(conf_file)):
@@ -85,33 +89,31 @@ class Recipe(object):
 
         open(conf_file, 'w').write(config_data)
 
-        dscript = zc.recipe.egg.Egg(self.buildout, 
-                                    self.name, 
-                                    {'eggs': 'supervisor', 
-                                     'scripts': 'supervisord=supervisord',
-                                     'initialization': 'import sys; sys.argv.extend(["-c","%s"])' % conf_file,}
-                                   )
+        dscript = zc.recipe.egg.Egg(self.buildout,
+              self.name,
+              {'eggs': 'supervisor',
+               'scripts': 'supervisord=supervisord',
+               'initialization': 'import sys; sys.argv.extend(["-c","%s"])' % \
+                                  conf_file})
 
         # Put all options into the ctl script
-        init = '["-c","%s","-u","%s","-p","%s","-s","%s"]' % (conf_file, user, password, serverurl)
+        init = '["-c","%s","-u","%s","-p","%s","-s","%s"]' % \
+                (conf_file, user, password, serverurl)
 
-        ctlscript = zc.recipe.egg.Egg(self.buildout, 
-                                      self.name, 
-                                      {'eggs': 'supervisor', 
-                                       'scripts': 'supervisorctl=supervisorctl',
-                                       'initialization': 'import sys; sys.argv[1:1] = %s' % init,
-                                       'arguments': 'sys.argv[1:]'
-                                      }
-                                     )
+        ctlscript = zc.recipe.egg.Egg(self.buildout,
+                    self.name,
+                    {'eggs': 'supervisor',
+                     'scripts': 'supervisorctl=supervisorctl',
+                     'initialization': 'import sys; sys.argv[1:1] = %s' % init,
+                     'arguments': 'sys.argv[1:]'})
 
-        return list(dscript.install()) + list(ctlscript.install()) + [conf_file]
+        return list(dscript.install()) + \
+               list(ctlscript.install()) + \
+               [conf_file]
 
     def update(self):
         """Updater"""
         pass
-
-
-
 
 
 config_template = """
@@ -132,8 +134,8 @@ nodaemon = %(nodaemon)s
 serverurl = %(serverurl)s
 
 [rpcinterface:supervisor]
-supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-    
+supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
+
 """
 
 program_template = """
@@ -145,7 +147,3 @@ priority = %(priority)s
 redirect_stderr = %(redirect_stderr)s
 
 """
-
-
-
-
