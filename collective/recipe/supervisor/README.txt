@@ -24,7 +24,7 @@ password
 
 supervisord-conf
     Full path to where the recipe puts the supervisord configuration file. 
-    Defaults to ${buildout:directory}/bin/supervisord.conf
+    Defaults to ${buildout:directory}/parts/${name}/supervisord.conf
 
 logfile
     The full path to the supervisord log file. Defaults to 
@@ -137,7 +137,7 @@ and control it with supervisorctl::
 
 now, get a look to the generated supervisord.conf file::
 
-    >>> cat('bin', 'supervisord.conf')
+    >>> cat('parts', 'supervisor', 'supervisord.conf')
     <BLANKLINE>
     [inet_http_server]
     port = 9001
@@ -224,7 +224,7 @@ configuration file is given as argument with the '-c' option::
     <BLANKLINE>
     ...
     <BLANKLINE>
-    import sys; sys.argv.extend(["-c","/sample-buildout/bin/supervisord.conf"])
+    import sys; sys.argv.extend(["-c","/sample-buildout/parts/supervisor/supervisord.conf"])
     <BLANKLINE>
     import supervisor.supervisord
     <BLANKLINE>
@@ -239,7 +239,7 @@ username. This allows to run it as is::
     <BLANKLINE>
     ...
     <BLANKLINE>
-    import sys; sys.argv[1:1] = ["-c","/sample-buildout/bin/supervisord.conf","-u","mustapha","-p","secret","-s","http://supervisor.mustap.com"]
+    import sys; sys.argv[1:1] = ["-c","/sample-buildout/parts/supervisor/supervisord.conf","-u","mustapha","-p","secret","-s","http://supervisor.mustap.com"]
     <BLANKLINE>
     import supervisor.supervisorctl
     <BLANKLINE>

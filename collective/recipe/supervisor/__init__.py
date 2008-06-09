@@ -80,19 +80,19 @@ class Recipe(object):
                                 args = parts.get('args') or '',
                            )
 
-        conf_file = os.path.join(self.buildout['buildout']['bin-directory'],
-                                 'supervisord.conf')
+        conf_file = os.path.join(self.buildout['buildout']['parts-directory'],
+                                 self.name, 'supervisord.conf')
         if self.options.get('supervisord-conf', None) is not None:
             conf_file = self.options.get('supervisord-conf')
-            if not os.path.exists(os.path.dirname(conf_file)):
-                os.makedirs(os.path.dirname(conf_file))
+        if not os.path.exists(os.path.dirname(conf_file)):
+            os.makedirs(os.path.dirname(conf_file))
 
         open(conf_file, 'w').write(config_data)
 
         dscript = zc.recipe.egg.Egg(self.buildout,
               self.name,
               {'eggs': 'supervisor',
-               'scripts': 'supervisord=supervisord',
+               'scripts': 'supervisord=%sd' % self.name,
                'initialization': 'import sys; sys.argv.extend(["-c","%s"])' % \
                                   conf_file})
 
@@ -103,7 +103,7 @@ class Recipe(object):
         ctlscript = zc.recipe.egg.Egg(self.buildout,
                     self.name,
                     {'eggs': 'supervisor',
-                     'scripts': 'supervisorctl=supervisorctl',
+                     'scripts': 'supervisorctl=%sctl' % self.name,
                      'initialization': 'import sys; sys.argv[1:1] = %s' % init,
                      'arguments': 'sys.argv[1:]'})
 
