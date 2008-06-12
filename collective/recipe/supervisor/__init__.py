@@ -28,9 +28,16 @@ class Recipe(object):
                                                            'var',
                                                            'log',
                                                            'supervisord.log'))
+        log_dir = os.path.abspath(os.path.dirname(logfile))
+        if not os.path.isdir(log_dir):
+            os.makedirs(log_dir)
+
         pidfile = self.options.get('pidfile', os.path.join(buildout_dir,
                                                            'var',
                                                            'supervisord.pid'))
+        pid_dir = os.path.abspath(os.path.dirname(pidfile))
+        if not os.path.isdir(pid_dir):
+            os.makedirs(pid_dir)
 
         logfile_maxbytes = self.options.get('logfile-maxbytes', '50MB')
         logfile_backups = self.options.get('logfile-backups', '10')

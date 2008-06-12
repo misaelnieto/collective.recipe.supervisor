@@ -1,7 +1,11 @@
-0.4 (unreleased)
+0.4 (2008-06-12)
 ================
 
-  -
+  - Use dynamic script names to allow multiple cluster
+    [gawel]
+
+  - Ensure that the log dir is created when used without zope's recipes
+    [gawel]
 
 
 0.3 (2008-06-01)

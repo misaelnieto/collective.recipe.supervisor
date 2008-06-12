@@ -246,3 +246,8 @@ username. This allows to run it as is::
     if __name__ == '__main__':
         supervisor.supervisorctl.main(sys.argv[1:])
 
+The log directory is created by the recipe::
+
+    >>> ls(sample_buildout, 'var')
+    d  log
+
