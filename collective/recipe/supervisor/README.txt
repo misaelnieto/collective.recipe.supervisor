@@ -2,7 +2,7 @@ This recipe when used will do the following:
 
  * install ``supervisor`` and all its dependecies.
 
- * generates the supervisord and supervisorctl scripts in the bin directory 
+ * generates the supervisord, supervisorctl, and memmon scripts in the bin directory 
 
  * generates a configuration file to be used by supervisord and supervisorctl
    scripts
@@ -70,6 +70,21 @@ programs
 
        priority process_name command [[args]]
 
+eventlisteners
+    A list of eventlisteners you'd like supervisord to run as subprocesses to
+    subscribe to event notifications. One per line. Relevant supervisor 
+    documentation about events at http://supervisord.org/manual/current/events.html.
+    
+        events command [[args]]
+    
+    Supervisor provides one such event listener called memmon which can be used to
+    restart supervisord child process once they reach a certain memory limit.  An
+    example of defining a memmon event listener, which analyzes memory usage 
+    every 60 seconds and restarts as needed could look like:
+    
+        TICK_60 ${buildout:bin-directory}/memmon [-p process_name=200MB]
+    
+
 
 
 Example usage
@@ -103,6 +118,8 @@ We'll start by creating a buildout that uses the recipe::
     ...       50 other ${buildout:bin-directory}/other [-n 100] /tmp
     ...       60 other2 ${buildout:bin-directory}/other2 [-n 100] true
     ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true
+    ... eventlisteners =
+    ...       TICK_60 ${buildout:bin-directory}/memmon [-p instance1=200MB]
     ... """)
 
 Chris Mc Donough said::
@@ -124,6 +141,7 @@ Running the buildout gives us::
     Getting distribution for 'supervisor'.
     ...
     Generated script '/sample-buildout/bin/supervisord'.
+    Generated script '/sample-buildout/bin/memmon'.
     Generated script '/sample-buildout/bin/supervisorctl'.
     <BLANKLINE>
 
@@ -134,6 +152,10 @@ You can now just run the supervisord like this::
 and control it with supervisorctl::
 
     $ bin/supervisorctl
+
+Memory monitoring via supervisor's memmon event listener will be executed via supervisord with the following::
+
+    $ bin/memmon
 
 now, get a look to the generated supervisord.conf file::
 
@@ -214,6 +236,12 @@ now, get a look to the generated supervisord.conf file::
     priority = 70
     redirect_stderr = true
     <BLANKLINE>
+    <BLANKLINE>
+    [eventlistener:memmon]
+    command = /sample-buildout/bin/memmon -p instance1=200MB
+    events = TICK_60
+    environment=SUPERVISOR_USERNAME=mustapha,SUPERVISOR_PASSWORD=secret,serverurl=http://supervisor.mustap.com
+
 
 
 and if we look to generated supervisord script we will see that the 
@@ -245,6 +273,18 @@ username. This allows to run it as is::
     <BLANKLINE>
     if __name__ == '__main__':
         supervisor.supervisorctl.main(sys.argv[1:])
+
+Memmon delegates all work to the egg's memmon Python script itself::
+
+    >>> cat('bin', 'memmon')
+    ...
+    <BLANKLINE>
+    ...
+    <BLANKLINE>
+    import supervisor.memmon
+    <BLANKLINE>
+    if __name__ == '__main__':
+        supervisor.memmon.main()
 
 The log directory is created by the recipe::
 

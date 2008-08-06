@@ -87,6 +87,31 @@ class Recipe(object):
                                 args = parts.get('args') or '',
                            )
 
+        #eventlisteners
+        eventlisteners = [e for e in self.options.get('eventlisteners', '').splitlines()
+                            if e]
+        pattern = re.compile("(?P<events>[^\s]+)"
+                             "\s+"
+                             "(?P<command>[^\s]+)"
+                             "(\s+\[(?P<args>[^\]]+)\])?")
+
+        for eventlistener in eventlisteners:
+            match = pattern.match(eventlistener)
+            if not match:
+                raise(ValueError, "Event Listeners line incorrect: %s" % eventlistener)
+
+            parts = match.groupdict()
+            
+            config_data += eventlistener_template % \
+                           dict(events = parts.get('events'),
+                                command = parts.get('command'),
+                                args = parts.get('args'),
+                                user = user, 
+                                password = password, 
+                                serverurl = serverurl,
+                           )
+        
+        
         conf_file = os.path.join(self.buildout['buildout']['parts-directory'],
                                  self.name, 'supervisord.conf')
         if self.options.get('supervisord-conf', None) is not None:
@@ -103,6 +128,11 @@ class Recipe(object):
                'initialization': 'import sys; sys.argv.extend(["-c","%s"])' % \
                                   conf_file})
 
+        memscript = zc.recipe.egg.Egg(self.buildout,
+              self.name,
+              {'eggs': 'supervisor',
+               'scripts': 'memmon=memmon',})
+
         # Put all options into the ctl script
         init = '["-c","%s","-u","%s","-p","%s","-s","%s"]' % \
                 (conf_file, user, password, serverurl)
@@ -115,6 +145,7 @@ class Recipe(object):
                      'arguments': 'sys.argv[1:]'})
 
         return list(dscript.install()) + \
+               list(memscript.install()) + \
                list(ctlscript.install()) + \
                [conf_file]
 
@@ -153,4 +184,11 @@ directory = %(directory)s
 priority = %(priority)s
 redirect_stderr = %(redirect_stderr)s
 
+"""
+
+eventlistener_template = """
+[eventlistener:memmon]
+command = %(command)s %(args)s
+events = %(events)s
+environment=SUPERVISOR_USERNAME=%(user)s,SUPERVISOR_PASSWORD=%(password)s,serverurl=%(serverurl)s
 """
