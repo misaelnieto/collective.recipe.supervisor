@@ -1,4 +1,4 @@
-Mustapha Benali, Author
-Hanno Schlichting, Contributor
-gawel, Contributor
-aburkhalter, Contributor
+- Mustapha Benali, Author
+- Hanno Schlichting, Contributor
+- gawel, Contributor
+- aburkhalter, Contributor
