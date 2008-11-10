@@ -1,6 +1,9 @@
 0.6 (unreleased)
 ================
 
+- One can now specify the user account that will be used as the account 
+  which runs the program.
+  [amos]
 
 0.5 (2008-08-23)
 ================

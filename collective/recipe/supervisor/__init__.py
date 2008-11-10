@@ -67,7 +67,8 @@ class Recipe(object):
                              "(?P<command>[^\s]+)"
                              "(\s+\[(?P<args>(?!true|false)[^\]]+)\])?"
                              "(\s+(?P<directory>(?!true|false)[^\s]+))?"
-                             "(\s+(?P<redirect>(true|false)))?")
+                             "(\s+(?P<redirect>(true|false)))?"
+                             "(\s+(?P<user>[^\s]+))?")
 
         for program in programs:
             match = pattern.match(program)
@@ -75,6 +76,11 @@ class Recipe(object):
                 raise(ValueError, "Program line incorrect: %s" % program)
 
             parts = match.groupdict()
+            program_user = parts.get('user')
+            if program_user:
+                user_config = 'user = %s\n' % program_user
+            else:
+                user_config = ''
 
             config_data += program_template % \
                            dict(program = parts.get('processname'),
@@ -85,6 +91,7 @@ class Recipe(object):
                                 directory = parts.get('directory') or \
                                          os.path.dirname(parts.get('command')),
                                 args = parts.get('args') or '',
+                                user_config = user_config,
                            )
 
         #eventlisteners
@@ -183,6 +190,7 @@ process_name = %(program)s
 directory = %(directory)s
 priority = %(priority)s
 redirect_stderr = %(redirect_stderr)s
+%(user_config)s
 
 """
 

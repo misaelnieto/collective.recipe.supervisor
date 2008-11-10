@@ -58,13 +58,16 @@ programs
    A list of programs you want the supervisord to control. One per line. 
    The format of a line is as follow:
    
-       priority process_name command [[args] [directory] [[redirect_stderr]]]
+       priority process_name command [[args] [directory] [[redirect_stderr]]
+                                     [user]]
    
    The [args] is any number of arguments you want to pass to the ``command``
    It has to be given between [] (ie.: [-v fg]). See examples below.
    If not given the redirect_stderr defaults to false.
    If not given the directory option defaults to the directory containing the
    the command.
+   The optional user argument gives the userid that the process should be run
+   as (if supervisord is run as root).
 
    In most cases you will only need to give the 4 first parts:
 
@@ -117,7 +120,7 @@ We'll start by creating a buildout that uses the recipe::
     ...       40 maildrophost ${buildout:bin-directory}/maildropctl true
     ...       50 other ${buildout:bin-directory}/other [-n 100] /tmp
     ...       60 other2 ${buildout:bin-directory}/other2 [-n 100] true
-    ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true
+    ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true www-data
     ... eventlisteners =
     ...       TICK_60 ${buildout:bin-directory}/memmon [-p instance1=200MB]
     ... """)
@@ -135,6 +138,8 @@ Chris Mc Donough said::
 Running the buildout gives us::
 
     >>> print system(buildout)
+    Getting distribution for 'zc.recipe.egg'.
+    ...
     Installing supervisor.
     Getting distribution for 'supervisor'.
     ...
@@ -233,6 +238,7 @@ now, get a look to the generated supervisord.conf file::
     directory = /tmp3
     priority = 70
     redirect_stderr = true
+    user = www-data
     <BLANKLINE>
     <BLANKLINE>
     [eventlistener:memmon]
