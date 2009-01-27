@@ -3,28 +3,38 @@
 
 
 
+0.7 (2009-01-27)
+================
+
+ - Added 'plugins' option so we can install extra eggs (supervisor plugins)
+   [mustapha]
+
+ - Some fixes for eventlistner part [mustapha]
+
+ - Updated tests
+
 0.6 (2008-11-10)
 ================
 
-- One can now specify the user account that will be used as the account 
-  which runs the program.
-  [amos]
+ - One can now specify the user account that will be used as the account 
+   which runs the program.
+   [amos]
 
 0.5 (2008-08-23)
 ================
 
-- Adding eventlistners option for use as event notification framework.  
-  Targetting use with supervisor's memmon event listener
-  [aburkhalter]
+ - Adding eventlistners option for use as event notification framework.  
+   Targetting use with supervisor's memmon event listener
+   [aburkhalter]
  
 0.4 (2008-06-12)
 ================
 
-  - Use dynamic script names to allow multiple cluster
-    [gawel]
+ - Use dynamic script names to allow multiple cluster
+   [gawel]
 
-  - Ensure that the log dir is created when used without zope's recipes
-    [gawel]
+ - Ensure that the log dir is created when used without zope's recipes
+   [gawel]
 
 
 0.3 (2008-06-01)

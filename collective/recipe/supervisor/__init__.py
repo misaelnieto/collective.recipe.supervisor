@@ -97,7 +97,10 @@ class Recipe(object):
         #eventlisteners
         eventlisteners = [e for e in self.options.get('eventlisteners', '').splitlines()
                             if e]
-        pattern = re.compile("(?P<events>[^\s]+)"
+
+        pattern = re.compile("(?P<processname>[^\s]+)"
+                             "\s+"
+                             "(?P<events>[^\s]+)"
                              "\s+"
                              "(?P<command>[^\s]+)"
                              "(\s+\[(?P<args>[^\]]+)\])?")
@@ -110,7 +113,8 @@ class Recipe(object):
             parts = match.groupdict()
             
             config_data += eventlistener_template % \
-                           dict(events = parts.get('events'),
+                           dict(name = parts.get('processname'),
+                                events = parts.get('events'),
                                 command = parts.get('command'),
                                 args = parts.get('args'),
                                 user = user, 
@@ -150,10 +154,22 @@ class Recipe(object):
                      'scripts': 'supervisorctl=%sctl' % self.name,
                      'initialization': 'import sys; sys.argv[1:1] = %s' % init,
                      'arguments': 'sys.argv[1:]'})
+                     
+        #install extra eggs if any
+        eggs = self.options.get('plugins', '')       
+        
+        extra_eggs = []
+        if eggs:
+            extra_eggs = list(zc.recipe.egg.Egg(self.buildout,
+                                                self.name,
+                                                {'eggs':eggs}).install())
+            
+        
 
         return list(dscript.install()) + \
                list(memscript.install()) + \
                list(ctlscript.install()) + \
+               extra_eggs + \
                [conf_file]
 
     def update(self):
@@ -195,8 +211,9 @@ redirect_stderr = %(redirect_stderr)s
 """
 
 eventlistener_template = """
-[eventlistener:memmon]
+[eventlistener:%(name)s]
 command = %(command)s %(args)s
 events = %(events)s
-environment=SUPERVISOR_USERNAME=%(user)s,SUPERVISOR_PASSWORD=%(password)s,serverurl=%(serverurl)s
+process_name=%(name)s
+environment=SUPERVISOR_USERNAME=%(user)s,SUPERVISOR_PASSWORD=%(password)s,SUPERVISOR_SERVER_URL=%(serverurl)s
 """

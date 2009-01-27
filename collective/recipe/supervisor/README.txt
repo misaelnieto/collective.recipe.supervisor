@@ -2,7 +2,8 @@ This recipe when used will do the following:
 
  * install ``supervisor`` and all its dependecies.
 
- * generates the supervisord, supervisorctl, and memmon scripts in the bin directory 
+ * generates the supervisord, supervisorctl, and memmon scripts in the bin 
+   directory 
 
  * generates a configuration file to be used by supervisord and supervisorctl
    scripts
@@ -12,6 +13,9 @@ Supported options
 
 The recipe supports the following options:
 
+plugins
+    Extra eggs you want the recipe to install. ie: superlance
+        
 port
     The port nummber supervisord listen to. ie: 9001. Can be given as host:port
     like 127.0.0.1:9001. Defaults to 127.0.0.1:9001
@@ -76,16 +80,20 @@ programs
 eventlisteners
     A list of eventlisteners you'd like supervisord to run as subprocesses to
     subscribe to event notifications. One per line. Relevant supervisor 
-    documentation about events at http://supervisord.org/manual/current/events.html.
+    documentation about events at 
+    http://supervisord.org/manual/current/events.html.
     
-        events command [[args]]
+        processname events command [[args]]
     
-    Supervisor provides one such event listener called memmon which can be used to
-    restart supervisord child process once they reach a certain memory limit.  An
-    example of defining a memmon event listener, which analyzes memory usage 
+    ``events`` is a comma-separated list (without spaces) of event type names 
+    that the listener is "interested" in receiving notifications for.
+    
+    Supervisor provides one event listener called memmon which can be used to
+    restart supervisord child process once they reach a certain memory limit.
+    An example of defining a memmon event listener, which analyzes memory usage 
     every 60 seconds and restarts as needed could look like:
     
-        TICK_60 ${buildout:bin-directory}/memmon [-p process_name=200MB]
+       MemoryMonitor TICK_60 ${buildout:bin-directory}/memmon [-p process_name=200MB]
     
 
 
@@ -109,6 +117,8 @@ We'll start by creating a buildout that uses the recipe::
     ...
     ... [supervisor]
     ... recipe = collective.recipe.supervisor
+    ... plugins =
+    ...       superlance
     ... port = 9001
     ... user = mustapha
     ... password = secret
@@ -122,7 +132,8 @@ We'll start by creating a buildout that uses the recipe::
     ...       60 other2 ${buildout:bin-directory}/other2 [-n 100] true
     ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true www-data
     ... eventlisteners =
-    ...       TICK_60 ${buildout:bin-directory}/memmon [-p instance1=200MB]
+    ...       Memmon TICK_60 ${buildout:bin-directory}/memmon [-p instance1=200MB]
+    ...       HttpOk TICK_60 ${buildout:bin-directory}/httpok [-p site1 -t 20 http://localhost:8080/]
     ... """)
 
 Chris Mc Donough said::
@@ -141,12 +152,25 @@ Running the buildout gives us::
     Getting distribution for 'zc.recipe.egg'.
     ...
     Installing supervisor.
-    Getting distribution for 'supervisor'.
+    Getting distribution for 'superlance'.
     ...
+    Getting distribution for 'supervisor'.
+     ...
     Generated script '/sample-buildout/bin/supervisord'.
     Generated script '/sample-buildout/bin/memmon'.
     Generated script '/sample-buildout/bin/supervisorctl'.
     <BLANKLINE>
+
+Check that we have the 'crashmail' and 'httpok' scripts from superlance::
+
+    >>> ls(sample_buildout, 'bin')
+    -  buildout
+    -  crashmail
+    -  httpok
+    -  memmon
+    -  supervisorctl
+    -  supervisord
+    
 
 You can now just run the supervisord like this::
 
@@ -156,13 +180,14 @@ and control it with supervisorctl::
 
     $ bin/supervisorctl
 
-Memory monitoring via supervisor's memmon event listener will be executed via supervisord with the following::
+Memory monitoring via supervisor's memmon event listener will be executed via
+supervisord with the following::
 
     $ bin/memmon
 
 now, get a look to the generated supervisord.conf file::
 
-    >>> cat('parts', 'supervisor', 'supervisord.conf')
+    >>> cat('parts', 'supervisor', 'supervisord.conf') #doctest: +REPORT_NDIFF
     <BLANKLINE>
     [inet_http_server]
     port = 9001
@@ -241,10 +266,17 @@ now, get a look to the generated supervisord.conf file::
     user = www-data
     <BLANKLINE>
     <BLANKLINE>
-    [eventlistener:memmon]
+    [eventlistener:Memmon]
     command = /sample-buildout/bin/memmon -p instance1=200MB
     events = TICK_60
-    environment=SUPERVISOR_USERNAME=mustapha,SUPERVISOR_PASSWORD=secret,serverurl=http://supervisor.mustap.com
+    process_name=Memmon
+    environment=SUPERVISOR_USERNAME=mustapha,SUPERVISOR_PASSWORD=secret,SUPERVISOR_SERVER_URL=http://supervisor.mustap.com
+    <BLANKLINE>
+    [eventlistener:HttpOk]
+    command = /sample-buildout/bin/httpok -p site1 -t 20 http://localhost:8080/
+    events = TICK_60
+    process_name=HttpOk
+    environment=SUPERVISOR_USERNAME=mustapha,SUPERVISOR_PASSWORD=secret,SUPERVISOR_SERVER_URL=http://supervisor.mustap.com
 
 
 
