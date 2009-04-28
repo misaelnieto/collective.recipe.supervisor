@@ -1,4 +1,9 @@
-0.8 (unreleased)
+0.9 (unreleased)
+================
+
+ 
+
+0.8 (2009-04-27)
 ================
 
  - Make it possible to set additional options per process in the control script.
