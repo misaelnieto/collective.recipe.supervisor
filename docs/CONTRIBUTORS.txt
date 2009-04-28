@@ -3,3 +3,4 @@
 - gawel, Contributor
 - aburkhalter, Contributor
 - Amos Latteier, Contributor
+- Jacob Radford, Contributor

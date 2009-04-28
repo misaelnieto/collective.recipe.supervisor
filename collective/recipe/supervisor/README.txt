@@ -62,7 +62,7 @@ programs
    A list of programs you want the supervisord to control. One per line. 
    The format of a line is as follow:
    
-       priority process_name command [[args] [directory] [[redirect_stderr]]
+       priority process_name [(process_opts)] command [[args] [directory] [[redirect_stderr]]
                                      [user]]
    
    The [args] is any number of arguments you want to pass to the ``command``
@@ -70,6 +70,10 @@ programs
    If not given the redirect_stderr defaults to false.
    If not given the directory option defaults to the directory containing the
    the command.
+   The optional process_opts argument sets additional options on the proccess
+   in the supervisord configuration.  
+   It has to be given between ``()`` and must contain options in ``key=value`` format
+   with spaces only for separating options - ie.: (autostart=false startsecs=10).
    The optional user argument gives the userid that the process should be run
    as (if supervisord is run as root).
 
@@ -126,11 +130,11 @@ We'll start by creating a buildout that uses the recipe::
     ... programs =
     ...       10 zeo ${zeo:location}/bin/runzeo ${zeo:location}
     ...       20 instance1 ${instance1:location}/bin/runzope ${instance1:location} true
-    ...       30 instance2 ${instance2:location}/bin/runzope true
+    ...       30 instance2 (autostart=false) ${instance2:location}/bin/runzope true
     ...       40 maildrophost ${buildout:bin-directory}/maildropctl true
     ...       50 other ${buildout:bin-directory}/other [-n 100] /tmp
     ...       60 other2 ${buildout:bin-directory}/other2 [-n 100] true
-    ...       70 other3 ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true www-data
+    ...       70 other3 (startsecs=10) ${buildout:bin-directory}/other3 [-n -h -v --no-detach] /tmp3 true www-data
     ... eventlisteners =
     ...       Memmon TICK_60 ${buildout:bin-directory}/memmon [-p instance1=200MB]
     ...       HttpOk TICK_60 ${buildout:bin-directory}/httpok [-p site1 -t 20 http://localhost:8080/]
@@ -231,6 +235,7 @@ now, get a look to the generated supervisord.conf file::
     directory = /g/h/bin
     priority = 30
     redirect_stderr = true
+    autostart = false
     <BLANKLINE>
     <BLANKLINE>
     [program:maildrophost]
@@ -264,6 +269,7 @@ now, get a look to the generated supervisord.conf file::
     priority = 70
     redirect_stderr = true
     user = www-data
+    startsecs = 10
     <BLANKLINE>
     <BLANKLINE>
     [eventlistener:Memmon]

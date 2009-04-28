@@ -1,7 +1,8 @@
-0.7 (unreleased)
+0.8 (unreleased)
 ================
 
-
+ - Make it possible to set additional options per process in the control script.
+   [nkryptic]
 
 0.7 (2009-01-27)
 ================

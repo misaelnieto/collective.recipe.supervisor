@@ -63,6 +63,7 @@ class Recipe(object):
         pattern = re.compile("(?P<priority>\d+)"
                              "\s+"
                              "(?P<processname>[^\s]+)"
+                             "(\s+\((?P<processopts>([^\)]+))\))?"
                              "\s+"
                              "(?P<command>[^\s]+)"
                              "(\s+\[(?P<args>(?!true|false)[^\]]+)\])?"
@@ -77,10 +78,18 @@ class Recipe(object):
 
             parts = match.groupdict()
             program_user = parts.get('user')
+            process_options = parts.get('processopts')
+            extras = []
+
             if program_user:
-                user_config = 'user = %s\n' % program_user
-            else:
-                user_config = ''
+                extras.append( 'user = %s' % program_user )
+            if process_options:
+                for part in process_options.split():
+                    if part.find('=') == -1:
+                        continue
+                    (key, value) = part.split('=')
+                    if key and value:
+                        extras.append( "%s = %s" % (key, value) )
 
             config_data += program_template % \
                            dict(program = parts.get('processname'),
@@ -91,7 +100,7 @@ class Recipe(object):
                                 directory = parts.get('directory') or \
                                          os.path.dirname(parts.get('command')),
                                 args = parts.get('args') or '',
-                                user_config = user_config,
+                                extra_config = "\n".join( extras ),
                            )
 
         #eventlisteners
@@ -206,7 +215,7 @@ process_name = %(program)s
 directory = %(directory)s
 priority = %(priority)s
 redirect_stderr = %(redirect_stderr)s
-%(user_config)s
+%(extra_config)s
 
 """
 
