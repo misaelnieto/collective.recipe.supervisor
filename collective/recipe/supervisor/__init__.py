@@ -87,7 +87,7 @@ class Recipe(object):
                 for part in process_options.split():
                     if part.find('=') == -1:
                         continue
-                    (key, value) = part.split('=')
+                    (key, value) = part.split('=',1)
                     if key and value:
                         extras.append( "%s = %s" % (key, value) )
 
