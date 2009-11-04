@@ -160,12 +160,14 @@ Running the buildout gives us::
     ...
     Getting distribution for 'supervisor'.
      ...
-    Generated script '/sample-buildout/bin/supervisord'.
+    Generated script '/sample-buildout/bin/httpok'.
     Generated script '/sample-buildout/bin/memmon'.
+    Generated script '/sample-buildout/bin/crashmail'.
+    Generated script '/sample-buildout/bin/supervisord'.
     Generated script '/sample-buildout/bin/supervisorctl'.
     <BLANKLINE>
 
-Check that we have the 'crashmail' and 'httpok' scripts from superlance::
+Check that we have the 'crashmail', 'memmon' and 'httpok' scripts from superlance::
 
     >>> ls(sample_buildout, 'bin')
     -  buildout
@@ -323,13 +325,44 @@ Memmon delegates all work to the egg's memmon Python script itself::
     <BLANKLINE>
     ...
     <BLANKLINE>
-    import supervisor.memmon
+    import superlance.memmon
     <BLANKLINE>
     if __name__ == '__main__':
-        supervisor.memmon.main()
+        superlance.memmon.main()
 
 The log directory is created by the recipe::
 
     >>> ls(sample_buildout, 'var')
     d  log
 
+You can also specify a custom port to run the supervisor on, and the control
+script will automatically try to connect to the specified port:
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = supervisor
+    ... index = http://pypi.python.org/simple/
+    ...
+    ... [supervisor]
+    ... recipe = collective.recipe.supervisor
+    ... port = 9005
+    ... programs =
+    ...       50 other ${buildout:bin-directory}/other [-n 100] /tmp
+    ... """)
+
+Here we specified that the supervisor will be launched on port 9005. We can see
+that this is also set in the control script:
+
+    >>> _ = system(buildout)
+    >>> cat('bin', 'supervisorctl')
+    ...
+    <BLANKLINE>
+    ...
+    <BLANKLINE>
+    import sys; sys.argv[1:1] = ["-c","/sample-buildout/parts/supervisor/supervisord.conf","-u","","-p","","-s","http://localhost:9005"]
+    <BLANKLINE>
+    import supervisor.supervisorctl
+    <BLANKLINE>
+    if __name__ == '__main__':
+        supervisor.supervisorctl.main(sys.argv[1:])

@@ -44,7 +44,12 @@ class Recipe(object):
         loglevel = self.options.get('loglevel', 'info')
         nodaemon = self.options.get('nodaemon', 'false')
         #supervisorctl
-        serverurl = self.options.get('serverurl', 'http://localhost:9001')
+        if ':' in port:
+            default_serverhost = port
+        else:
+            default_serverhost = 'localhost:%s' % port
+        serverurl = self.options.get('serverurl',
+                                     'http://%s' % default_serverhost)
 
         config_data = config_template % dict(port = port,
                                            user = user,

@@ -4,3 +4,4 @@
 - aburkhalter, Contributor
 - Amos Latteier, Contributor
 - Jacob Radford, Contributor
+- Jonathan Ballet, Contributor
