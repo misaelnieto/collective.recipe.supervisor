@@ -18,53 +18,53 @@ class Recipe(object):
         # Return files that were created by the recipe. The buildout
         # will remove all returned files upon reinstall.
 
-        #inet_http_server
-        port = self.options.get('port', '127.0.0.1:9001')
-        user = self.options.get('user', '')
-        password = self.options.get('password', '')
-        #supervisord
+        # general options
+        enable = self.options.get('enable', 'ctl http rpc').split()
+
+        # supervisord
         buildout_dir = self.buildout['buildout']['directory']
         logfile = self.options.get('logfile', os.path.join(buildout_dir,
                                                            'var',
                                                            'log',
                                                            'supervisord.log'))
-        log_dir = os.path.abspath(os.path.dirname(logfile))
-        if not os.path.isdir(log_dir):
-            os.makedirs(log_dir)
-
         pidfile = self.options.get('pidfile', os.path.join(buildout_dir,
                                                            'var',
                                                            'supervisord.pid'))
+        log_dir = os.path.abspath(os.path.dirname(logfile))
         pid_dir = os.path.abspath(os.path.dirname(pidfile))
-        if not os.path.isdir(pid_dir):
-            os.makedirs(pid_dir)
-
         logfile_maxbytes = self.options.get('logfile-maxbytes', '50MB')
         logfile_backups = self.options.get('logfile-backups', '10')
         loglevel = self.options.get('loglevel', 'info')
         nodaemon = self.options.get('nodaemon', 'false')
-        #supervisorctl
+        config_data = CONFIG_TEMPLATE % locals()
+
+        # make dirs
+        for folder in [log_dir, pid_dir]:
+            if not os.path.isdir(folder):
+                os.makedirs(folder)
+
+        # inet_http_server
+        port = self.options.get('port', '127.0.0.1:9001')
+        user = self.options.get('user', '')
+        password = self.options.get('password', '')
+        if 'http' in enable:
+            config_data += HTTP_TEMPLATE % locals()
+
+        # supervisorctl
         if ':' in port:
             default_serverhost = port
         else:
             default_serverhost = 'localhost:%s' % port
-        serverurl = self.options.get('serverurl',
-                                     'http://%s' % default_serverhost)
+        serverurl = self.options.get('serverurl', 'http://%s' % default_serverhost)
+        if 'ctl' in enable:
+            config_data += CTL_TEMPLATE % locals()
 
-        config_data = config_template % dict(port = port,
-                                           user = user,
-                                           password = password,
-                                           logfile = logfile,
-                                           pidfile = pidfile,
-                                           logfile_maxbytes = logfile_maxbytes,
-                                           logfile_backups = logfile_backups,
-                                           loglevel = loglevel,
-                                           nodaemon = nodaemon,
-                                           serverurl = serverurl,
-                                         )
-        #programs
-        programs = [p for p in self.options.get('programs', '').splitlines()
-                            if p]
+        # rpc
+        if 'rpc' in enable:
+            config_data += RPC_TEMPLATE % locals()
+
+        # programs
+        programs = [p for p in self.options.get('programs', '').splitlines() if p]
         pattern = re.compile("(?P<priority>\d+)"
                              "\s+"
                              "(?P<processname>[^\s]+)"
@@ -96,7 +96,7 @@ class Recipe(object):
                     if key and value:
                         extras.append( "%s = %s" % (key, value) )
 
-            config_data += program_template % \
+            config_data += PROGRAM_TEMPLATE % \
                            dict(program = parts.get('processname'),
                                 command = parts.get('command'),
                                 priority = parts.get('priority'),
@@ -108,7 +108,7 @@ class Recipe(object):
                                 extra_config = "\n".join( extras ),
                            )
 
-        #eventlisteners
+        # eventlisteners
         eventlisteners = [e for e in self.options.get('eventlisteners', '').splitlines()
                             if e]
 
@@ -126,7 +126,7 @@ class Recipe(object):
 
             parts = match.groupdict()
             
-            config_data += eventlistener_template % \
+            config_data += EVENTLISTENER_TEMPLATE % \
                            dict(name = parts.get('processname'),
                                 events = parts.get('events'),
                                 command = parts.get('command'),
@@ -170,7 +170,7 @@ class Recipe(object):
                      'arguments': 'sys.argv[1:]'})
                      
         #install extra eggs if any
-        eggs = self.options.get('plugins', '')       
+        eggs = self.options.get('plugins', '')
         
         extra_eggs = []
         if eggs:
@@ -191,12 +191,7 @@ class Recipe(object):
         pass
 
 
-config_template = """
-[inet_http_server]
-port = %(port)s
-username = %(user)s
-password = %(password)s
-
+CONFIG_TEMPLATE = """
 [supervisord]
 logfile = %(logfile)s
 logfile_maxbytes = %(logfile_maxbytes)s
@@ -204,16 +199,26 @@ logfile_backups = %(logfile_backups)s
 loglevel = %(loglevel)s
 pidfile = %(pidfile)s
 nodaemon = %(nodaemon)s
-
-[supervisorctl]
-serverurl = %(serverurl)s
-
-[rpcinterface:supervisor]
-supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
-
 """
 
-program_template = """
+CTL_TEMPLATE = """
+[supervisorctl]
+serverurl = %(serverurl)s
+"""
+
+HTTP_TEMPLATE = """
+[inet_http_server]
+port = %(port)s
+username = %(user)s
+password = %(password)s
+"""
+
+RPC_TEMPLATE = """
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
+"""
+
+PROGRAM_TEMPLATE = """
 [program:%(program)s]
 command = %(command)s %(args)s
 process_name = %(program)s
@@ -221,10 +226,9 @@ directory = %(directory)s
 priority = %(priority)s
 redirect_stderr = %(redirect_stderr)s
 %(extra_config)s
-
 """
 
-eventlistener_template = """
+EVENTLISTENER_TEMPLATE = """
 [eventlistener:%(name)s]
 command = %(command)s %(args)s
 events = %(events)s

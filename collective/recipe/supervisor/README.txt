@@ -13,6 +13,10 @@ Supported options
 
 The recipe supports the following options:
 
+enable
+    List of enabled supervisor sections.
+    Defaults to "http ctl rpc"
+
 plugins
     Extra eggs you want the recipe to install. ie: superlance
         
