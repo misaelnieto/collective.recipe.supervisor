@@ -19,7 +19,7 @@ class Recipe(object):
         # will remove all returned files upon reinstall.
 
         # general options
-        enable = self.options.get('enable', 'ctl http rpc').split()
+        sections = self.options.get('sections', 'ctl http rpc').split()
 
         # supervisord
         buildout_dir = self.buildout['buildout']['directory']
@@ -47,7 +47,7 @@ class Recipe(object):
         port = self.options.get('port', '127.0.0.1:9001')
         user = self.options.get('user', '')
         password = self.options.get('password', '')
-        if 'http' in enable:
+        if 'http' in sections:
             config_data += HTTP_TEMPLATE % locals()
 
         # supervisorctl
@@ -56,11 +56,11 @@ class Recipe(object):
         else:
             default_serverhost = 'localhost:%s' % port
         serverurl = self.options.get('serverurl', 'http://%s' % default_serverhost)
-        if 'ctl' in enable:
+        if 'ctl' in sections:
             config_data += CTL_TEMPLATE % locals()
 
         # rpc
-        if 'rpc' in enable:
+        if 'rpc' in sections:
             config_data += RPC_TEMPLATE % locals()
 
         # programs

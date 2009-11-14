@@ -13,7 +13,7 @@ Supported options
 
 The recipe supports the following options:
 
-enable
+sections
     List of enabled supervisor sections.
     Defaults to "http ctl rpc"
 
