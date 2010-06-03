@@ -103,7 +103,8 @@ eventlisteners
     
        MemoryMonitor TICK_60 ${buildout:bin-directory}/memmon [-p process_name=200MB]
     
-
+env-path
+    The environment variable PATH, e.g. /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 
 
 Example usage

@@ -1,6 +1,7 @@
-0.10 (unreleased)
+0.10 (2010-06-03)
 =================
-
+ - Added an option for the environment variable PATH
+   [lucielejard]
  - Added support for disabling supervisor sections (such as http, rpc and ctl) [Domen Kozar]
 
 

@@ -38,6 +38,12 @@ class Recipe(object):
         nodaemon = self.options.get('nodaemon', 'false')
         config_data = CONFIG_TEMPLATE % locals()
 
+        # environment PATH variable
+        env_path = self.options.get('env-path', None)
+        if env_path is not None:
+            config_data += PATH_TEMPLATE % locals()
+
+
         # make dirs
         for folder in [log_dir, pid_dir]:
             if not os.path.isdir(folder):
@@ -125,18 +131,18 @@ class Recipe(object):
                 raise(ValueError, "Event Listeners line incorrect: %s" % eventlistener)
 
             parts = match.groupdict()
-            
+
             config_data += EVENTLISTENER_TEMPLATE % \
                            dict(name = parts.get('processname'),
                                 events = parts.get('events'),
                                 command = parts.get('command'),
                                 args = parts.get('args'),
-                                user = user, 
-                                password = password, 
+                                user = user,
+                                password = password,
                                 serverurl = serverurl,
                            )
-        
-        
+
+
         conf_file = os.path.join(self.buildout['buildout']['parts-directory'],
                                  self.name, 'supervisord.conf')
         if self.options.get('supervisord-conf', None) is not None:
@@ -168,17 +174,17 @@ class Recipe(object):
                      'scripts': 'supervisorctl=%sctl' % self.name,
                      'initialization': 'import sys; sys.argv[1:1] = %s' % init,
                      'arguments': 'sys.argv[1:]'})
-                     
+
         #install extra eggs if any
         eggs = self.options.get('plugins', '')
-        
+
         extra_eggs = []
         if eggs:
             extra_eggs = list(zc.recipe.egg.Egg(self.buildout,
                                                 self.name,
                                                 {'eggs':eggs}).install())
-            
-        
+
+
 
         return list(dscript.install()) + \
                list(memscript.install()) + \
@@ -199,6 +205,10 @@ logfile_backups = %(logfile_backups)s
 loglevel = %(loglevel)s
 pidfile = %(pidfile)s
 nodaemon = %(nodaemon)s
+"""
+
+PATH_TEMPLATE = """\
+environment=PATH=%(env_path)s
 """
 
 CTL_TEMPLATE = """
