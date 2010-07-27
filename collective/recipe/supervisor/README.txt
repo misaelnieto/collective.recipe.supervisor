@@ -98,10 +98,13 @@ eventlisteners
     
     Supervisor provides one event listener called memmon which can be used to
     restart supervisord child process once they reach a certain memory limit.
+    Note that you need to define the variables ``user``, ``password`` and ``serverurl``
+    (described in the supported options above) to be able to use the memmon listener.
     An example of defining a memmon event listener, which analyzes memory usage 
     every 60 seconds and restarts as needed could look like:
     
        MemoryMonitor TICK_60 ${buildout:bin-directory}/memmon [-p process_name=200MB]
+
     
 env-path
     The environment variable PATH, e.g. /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
