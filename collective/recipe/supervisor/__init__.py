@@ -142,6 +142,13 @@ class Recipe(object):
                                 serverurl = serverurl,
                            )
 
+        # include
+        files = [f for f in self.options.get('include', '').splitlines() if f]
+        if files:
+            stringfiles = " ".join(files)
+            config_data+= INCLUDE_TEMPLATE %\
+                          dict(stringfiles=stringfiles,
+                              )
 
         conf_file = os.path.join(self.buildout['buildout']['parts-directory'],
                                  self.name, 'supervisord.conf')
@@ -245,3 +252,9 @@ events = %(events)s
 process_name=%(name)s
 environment=SUPERVISOR_USERNAME=%(user)s,SUPERVISOR_PASSWORD=%(password)s,SUPERVISOR_SERVER_URL=%(serverurl)s
 """
+
+INCLUDE_TEMPLATE = """                                                                
+[include]
+files = %(stringfiles)s
+"""
+
