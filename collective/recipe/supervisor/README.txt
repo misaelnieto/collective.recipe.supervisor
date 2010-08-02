@@ -34,6 +34,10 @@ supervisord-conf
     Full path to where the recipe puts the supervisord configuration file. 
     Defaults to ${buildout:directory}/parts/${name}/supervisord.conf
 
+childlogdir
+    The full path of the directory where log files of processes managed by
+    Supervisor while be stored. Defaults to ${buildout:directory}/var/log
+
 logfile
     The full path to the supervisord log file. Defaults to 
     ${buildout:directory}/var/log/supervisord.log
