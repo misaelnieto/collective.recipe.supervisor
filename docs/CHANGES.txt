@@ -1,3 +1,12 @@
+0.11 (2010-08-02)
+=================
+
+ - 'childlogdir' option of Supervisor is now configurable from Buildout
+   [Jonathan Ballet]
+
+ - [include] functionnality in the supervisor configuration file.
+   See http://supervisord.org/configuration.html#include
+   [ycadour]
 
 0.10.1 (2010-07-27)
 ===================
