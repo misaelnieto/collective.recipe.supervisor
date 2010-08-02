@@ -30,6 +30,9 @@ class Recipe(object):
         pidfile = self.options.get('pidfile', os.path.join(buildout_dir,
                                                            'var',
                                                            'supervisord.pid'))
+        childlogdir = self.options.get('childlogdir', os.path.join(buildout_dir,
+                                                           'var',
+                                                           'log'))
         log_dir = os.path.abspath(os.path.dirname(logfile))
         pid_dir = os.path.abspath(os.path.dirname(pidfile))
         logfile_maxbytes = self.options.get('logfile-maxbytes', '50MB')
@@ -45,7 +48,7 @@ class Recipe(object):
 
 
         # make dirs
-        for folder in [log_dir, pid_dir]:
+        for folder in [childlogdir, log_dir, pid_dir]:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
 
@@ -206,6 +209,7 @@ class Recipe(object):
 
 CONFIG_TEMPLATE = """
 [supervisord]
+childlogdir = %(childlogdir)s
 logfile = %(logfile)s
 logfile_maxbytes = %(logfile_maxbytes)s
 logfile_backups = %(logfile_backups)s

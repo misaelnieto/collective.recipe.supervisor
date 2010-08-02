@@ -204,6 +204,7 @@ now, get a look to the generated supervisord.conf file::
     >>> cat('parts', 'supervisor', 'supervisord.conf') #doctest: +REPORT_NDIFF
     <BLANKLINE>
     [supervisord]
+    childlogdir = /sample-buildout/var/log
     logfile = /sample-buildout/var/log/supervisord.log
     logfile_maxbytes = 50MB
     logfile_backups = 10
