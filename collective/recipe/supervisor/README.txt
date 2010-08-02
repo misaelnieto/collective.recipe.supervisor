@@ -203,11 +203,6 @@ now, get a look to the generated supervisord.conf file::
 
     >>> cat('parts', 'supervisor', 'supervisord.conf') #doctest: +REPORT_NDIFF
     <BLANKLINE>
-    [inet_http_server]
-    port = 9001
-    username = mustapha
-    password = secret
-    <BLANKLINE>
     [supervisord]
     logfile = /sample-buildout/var/log/supervisord.log
     logfile_maxbytes = 50MB
@@ -216,12 +211,16 @@ now, get a look to the generated supervisord.conf file::
     pidfile = /sample-buildout/var/supervisord.pid
     nodaemon = false
     <BLANKLINE>
+    [inet_http_server]
+    port = 9001
+    username = mustapha
+    password = secret
+    <BLANKLINE>
     [supervisorctl]
     serverurl = http://supervisor.mustap.com
     <BLANKLINE>
     [rpcinterface:supervisor]
     supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
-    <BLANKLINE>
     <BLANKLINE>
     [program:zeo]
     command = /a/b/c/bin/runzeo 
@@ -232,7 +231,7 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:instance1]
-    command = /e/f/bin/runzope
+    command = /e/f/bin/runzope 
     process_name = instance1
     directory = /e/f
     priority = 20
@@ -240,16 +239,15 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     <BLANKLINE>
     [program:instance2]
-    command = /g/h/bin/runzope
+    command = /g/h/bin/runzope 
     process_name = instance2
     directory = /g/h/bin
     priority = 30
     redirect_stderr = true
     autostart = false
     <BLANKLINE>
-    <BLANKLINE>
     [program:maildrophost]
-    command = /sample-buildout/bin/maildropctl
+    command = /sample-buildout/bin/maildropctl 
     process_name = maildrophost
     directory = /sample-buildout/bin
     priority = 40
@@ -280,7 +278,6 @@ now, get a look to the generated supervisord.conf file::
     redirect_stderr = true
     user = www-data
     startsecs = 10
-    <BLANKLINE>
     <BLANKLINE>
     [eventlistener:Memmon]
     command = /sample-buildout/bin/memmon -p instance1=200MB
