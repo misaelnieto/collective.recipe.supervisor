@@ -288,13 +288,13 @@ now, get a look to the generated supervisord.conf file::
     command = /sample-buildout/bin/memmon -p instance1=200MB
     events = TICK_60
     process_name=Memmon
-    environment=SUPERVISOR_USERNAME=mustapha,SUPERVISOR_PASSWORD=secret,SUPERVISOR_SERVER_URL=http://supervisor.mustap.com
+    environment=SUPERVISOR_USERNAME='mustapha',SUPERVISOR_PASSWORD='secret',SUPERVISOR_SERVER_URL='http://supervisor.mustap.com'
     <BLANKLINE>
     [eventlistener:HttpOk]
     command = /sample-buildout/bin/httpok -p site1 -t 20 http://localhost:8080/
     events = TICK_60
     process_name=HttpOk
-    environment=SUPERVISOR_USERNAME=mustapha,SUPERVISOR_PASSWORD=secret,SUPERVISOR_SERVER_URL=http://supervisor.mustap.com
+    environment=SUPERVISOR_USERNAME='mustapha',SUPERVISOR_PASSWORD='secret',SUPERVISOR_SERVER_URL='http://supervisor.mustap.com'
 
 
 
