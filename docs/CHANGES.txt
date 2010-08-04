@@ -1,4 +1,4 @@
-0.12 (unreleased)
+0.12 (2010-08-04)
 =================
 
  - Quote the environment variables that are written in the supervisor
