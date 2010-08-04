@@ -254,7 +254,7 @@ EVENTLISTENER_TEMPLATE = """
 command = %(command)s %(args)s
 events = %(events)s
 process_name=%(name)s
-environment=SUPERVISOR_USERNAME=%(user)s,SUPERVISOR_PASSWORD=%(password)s,SUPERVISOR_SERVER_URL=%(serverurl)s
+environment=SUPERVISOR_USERNAME='%(user)s',SUPERVISOR_PASSWORD='%(password)s',SUPERVISOR_SERVER_URL='%(serverurl)s'
 """
 
 INCLUDE_TEMPLATE = """                                                                
