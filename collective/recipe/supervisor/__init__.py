@@ -38,6 +38,7 @@ class Recipe(object):
         logfile_maxbytes = self.options.get('logfile-maxbytes', '50MB')
         logfile_backups = self.options.get('logfile-backups', '10')
         loglevel = self.options.get('loglevel', 'info')
+        umask = self.options.get('umask', '022')
         nodaemon = self.options.get('nodaemon', 'false')
         config_data = CONFIG_TEMPLATE % locals()
 
@@ -214,6 +215,7 @@ logfile_maxbytes = %(logfile_maxbytes)s
 logfile_backups = %(logfile_backups)s
 loglevel = %(loglevel)s
 pidfile = %(pidfile)s
+umask = %(umask)s
 nodaemon = %(nodaemon)s
 """
 

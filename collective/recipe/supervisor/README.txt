@@ -58,6 +58,9 @@ loglevel
    The logging level. Can be one of critical, error, warn, info, debug, trace, 
    or blather. Defaults to info
 
+umask
+   The umask of the supervisord process. Defaults to 022.
+
 nodaemon
    If true, supervisord will start in the foreground instead of daemonizing.
    Defaults to false
