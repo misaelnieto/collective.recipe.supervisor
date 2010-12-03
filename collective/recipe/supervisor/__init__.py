@@ -174,9 +174,8 @@ class Recipe(object):
               {'eggs': 'supervisor',
                'scripts': 'memmon=memmon',})
 
-        # Put all options into the ctl script
-        init = '["-c","%s","-u","%s","-p","%s","-s","%s"]' % \
-                (conf_file, user, password, serverurl)
+        init = '["-c","%s"]' % \
+                (conf_file,)
 
         ctlscript = zc.recipe.egg.Egg(self.buildout,
                     self.name,
@@ -225,6 +224,8 @@ environment=PATH=%(env_path)s
 CTL_TEMPLATE = """
 [supervisorctl]
 serverurl = %(serverurl)s
+username = %(user)s
+password = %(password)s
 """
 
 HTTP_TEMPLATE = """
