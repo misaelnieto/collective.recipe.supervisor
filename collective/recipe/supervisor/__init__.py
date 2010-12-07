@@ -39,6 +39,7 @@ class Recipe(object):
         logfile_backups = self.options.get('logfile-backups', '10')
         loglevel = self.options.get('loglevel', 'info')
         nodaemon = self.options.get('nodaemon', 'false')
+        nocleanup = self.options.get('nocleanup', 'false')
         config_data = CONFIG_TEMPLATE % locals()
 
         # environment PATH variable
@@ -216,6 +217,7 @@ logfile_backups = %(logfile_backups)s
 loglevel = %(loglevel)s
 pidfile = %(pidfile)s
 nodaemon = %(nodaemon)s
+nocleanup = %(nocleanup)s
 """
 
 PATH_TEMPLATE = """\

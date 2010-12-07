@@ -62,6 +62,10 @@ nodaemon
    If true, supervisord will start in the foreground instead of daemonizing.
    Defaults to false
 
+nocleanup
+  Prevent supervisord from clearing any existing AUTO child log files at
+  startup time. Useful for debugging. Defaults to false
+
 serverurl
    The URL that should be used to access the supervisord server. Defaults to
    http://127.0.0.1:9001

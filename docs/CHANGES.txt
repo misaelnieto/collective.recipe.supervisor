@@ -1,6 +1,8 @@
-0.13 (unreleased)
+0.13 (2010-12-07)
 =================
 
+ - 'nocleanup' option of Supervisor is now configurable from Buildout
+   Patch from Damien Letournel
 
 0.12 (2010-08-04)
 =================
