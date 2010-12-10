@@ -40,6 +40,7 @@ class Recipe(object):
         loglevel = self.options.get('loglevel', 'info')
         umask = self.options.get('umask', '022')
         nodaemon = self.options.get('nodaemon', 'false')
+        nocleanup = self.options.get('nocleanup', 'false')
         config_data = CONFIG_TEMPLATE % locals()
 
         # environment PATH variable
@@ -217,6 +218,7 @@ loglevel = %(loglevel)s
 pidfile = %(pidfile)s
 umask = %(umask)s
 nodaemon = %(nodaemon)s
+nocleanup = %(nocleanup)s
 """
 
 PATH_TEMPLATE = """\

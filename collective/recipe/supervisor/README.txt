@@ -65,6 +65,10 @@ nodaemon
    If true, supervisord will start in the foreground instead of daemonizing.
    Defaults to false
 
+nocleanup
+  Prevent supervisord from clearing any existing AUTO child log files at
+  startup time. Useful for debugging. Defaults to false
+
 serverurl
    The URL that should be used to access the supervisord server. Defaults to
    http://127.0.0.1:9001
@@ -168,7 +172,6 @@ Chris Mc Donough said::
 Running the buildout gives us::
 
     >>> print system(buildout)
-    Getting distribution for 'zc.recipe.egg'.
     ...
     Installing supervisor.
     Getting distribution for 'superlance'.
@@ -218,6 +221,7 @@ now, get a look to the generated supervisord.conf file::
     loglevel = info
     pidfile = /sample-buildout/var/supervisord.pid
     nodaemon = false
+    nocleanup = false
     <BLANKLINE>
     [inet_http_server]
     port = 9001
