@@ -220,6 +220,7 @@ now, get a look to the generated supervisord.conf file::
     logfile_backups = 10
     loglevel = info
     pidfile = /sample-buildout/var/supervisord.pid
+    umask = 022
     nodaemon = false
     nocleanup = false
     <BLANKLINE>
@@ -230,6 +231,8 @@ now, get a look to the generated supervisord.conf file::
     <BLANKLINE>
     [supervisorctl]
     serverurl = http://supervisor.mustap.com
+    username = mustapha
+    password = secret
     <BLANKLINE>
     [rpcinterface:supervisor]
     supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
@@ -328,7 +331,7 @@ username. This allows to run it as is::
     <BLANKLINE>
     ...
     <BLANKLINE>
-    import sys; sys.argv[1:1] = ["-c","/sample-buildout/parts/supervisor/supervisord.conf","-u","mustapha","-p","secret","-s","http://supervisor.mustap.com"]
+    import sys; sys.argv[1:1] = ["-c","/sample-buildout/parts/supervisor/supervisord.conf"]
     <BLANKLINE>
     import supervisor.supervisorctl
     <BLANKLINE>
@@ -377,7 +380,7 @@ that this is also set in the control script:
     <BLANKLINE>
     ...
     <BLANKLINE>
-    import sys; sys.argv[1:1] = ["-c","/sample-buildout/parts/supervisor/supervisord.conf","-u","","-p","","-s","http://localhost:9005"]
+    import sys; sys.argv[1:1] = ["-c","/sample-buildout/parts/supervisor/supervisord.conf"]
     <BLANKLINE>
     import supervisor.supervisorctl
     <BLANKLINE>
