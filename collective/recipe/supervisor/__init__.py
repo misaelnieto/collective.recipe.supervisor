@@ -38,6 +38,7 @@ class Recipe(object):
         logfile_maxbytes = self.options.get('logfile-maxbytes', '50MB')
         logfile_backups = self.options.get('logfile-backups', '10')
         loglevel = self.options.get('loglevel', 'info')
+        umask = self.options.get('umask', '022')
         nodaemon = self.options.get('nodaemon', 'false')
         nocleanup = self.options.get('nocleanup', 'false')
         config_data = CONFIG_TEMPLATE % locals()
@@ -175,9 +176,8 @@ class Recipe(object):
               {'eggs': 'supervisor',
                'scripts': 'memmon=memmon',})
 
-        # Put all options into the ctl script
-        init = '["-c","%s","-u","%s","-p","%s","-s","%s"]' % \
-                (conf_file, user, password, serverurl)
+        init = '["-c","%s"]' % \
+                (conf_file,)
 
         ctlscript = zc.recipe.egg.Egg(self.buildout,
                     self.name,
@@ -216,6 +216,7 @@ logfile_maxbytes = %(logfile_maxbytes)s
 logfile_backups = %(logfile_backups)s
 loglevel = %(loglevel)s
 pidfile = %(pidfile)s
+umask = %(umask)s
 nodaemon = %(nodaemon)s
 nocleanup = %(nocleanup)s
 """
@@ -227,6 +228,8 @@ environment=PATH=%(env_path)s
 CTL_TEMPLATE = """
 [supervisorctl]
 serverurl = %(serverurl)s
+username = %(user)s
+password = %(password)s
 """
 
 HTTP_TEMPLATE = """
