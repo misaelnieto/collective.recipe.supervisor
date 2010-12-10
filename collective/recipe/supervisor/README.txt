@@ -169,7 +169,6 @@ Chris Mc Donough said::
 Running the buildout gives us::
 
     >>> print system(buildout)
-    Getting distribution for 'zc.recipe.egg'.
     ...
     Installing supervisor.
     Getting distribution for 'superlance'.
@@ -219,6 +218,7 @@ now, get a look to the generated supervisord.conf file::
     loglevel = info
     pidfile = /sample-buildout/var/supervisord.pid
     nodaemon = false
+    nocleanup = false
     <BLANKLINE>
     [inet_http_server]
     port = 9001
