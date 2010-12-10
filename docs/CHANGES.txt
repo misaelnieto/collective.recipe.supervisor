@@ -1,6 +1,13 @@
 0.14 (unreleased)
 =================
 
+ - Added support for the umask option of supervisord
+   [servilio@mcmaster.ca]
+
+ - Move the credentials needed for authenticating with the supervisord
+   process from the supervisorctl script to the configuration
+   file. Because of bug 180705 of zc.buildout, scripts are made
+   world-readable. [servilio@mcmaster.ca]
 
 0.13 (2010-12-07)
 =================
