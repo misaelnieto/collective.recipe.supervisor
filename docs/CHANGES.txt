@@ -1,4 +1,4 @@
-0.14 (unreleased)
+0.14 (2010-12-10)
 =================
 
  - Added support for the umask option of supervisord
