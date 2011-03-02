@@ -35,6 +35,7 @@ class Recipe(object):
                                                            'log'))
         log_dir = os.path.abspath(os.path.dirname(logfile))
         pid_dir = os.path.abspath(os.path.dirname(pidfile))
+        http_socket = self.options.get('http-socket', 'inet')
         logfile_maxbytes = self.options.get('logfile-maxbytes', '50MB')
         logfile_backups = self.options.get('logfile-backups', '10')
         loglevel = self.options.get('loglevel', 'info')
@@ -48,18 +49,24 @@ class Recipe(object):
         if env_path is not None:
             config_data += PATH_TEMPLATE % locals()
 
-
         # make dirs
         for folder in [childlogdir, log_dir, pid_dir]:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
 
-        # inet_http_server
+        # (unix|inet)_http_server
         port = self.options.get('port', '127.0.0.1:9001')
         user = self.options.get('user', '')
         password = self.options.get('password', '')
         if 'http' in sections:
-            config_data += HTTP_TEMPLATE % locals()
+            if http_socket == 'inet':
+                config_data += INET_HTTP_TEMPLATE % locals()
+            elif http_socket == 'unix':
+                file_ = self.options.get('file', '')
+                chmod = self.options.get('chmod', '0700')
+                config_data += UNIX_HTTP_TEMPLATE % locals()
+            else:
+                raise ValueError("http-socket only supports values inet or unix.")
 
         # supervisorctl
         if ':' in port:
@@ -90,7 +97,7 @@ class Recipe(object):
         for program in programs:
             match = pattern.match(program)
             if not match:
-                raise(ValueError, "Program line incorrect: %s" % program)
+                raise ValueError("Program line incorrect: %s" % program)
 
             parts = match.groupdict()
             program_user = parts.get('user')
@@ -133,7 +140,7 @@ class Recipe(object):
         for eventlistener in eventlisteners:
             match = pattern.match(eventlistener)
             if not match:
-                raise(ValueError, "Event Listeners line incorrect: %s" % eventlistener)
+                raise ValueError("Event Listeners line incorrect: %s" % eventlistener)
 
             parts = match.groupdict()
 
@@ -232,11 +239,19 @@ username = %(user)s
 password = %(password)s
 """
 
-HTTP_TEMPLATE = """
+INET_HTTP_TEMPLATE = """
 [inet_http_server]
 port = %(port)s
 username = %(user)s
 password = %(password)s
+"""
+
+UNIX_HTTP_TEMPLATE = """
+[unix_http_server]
+file = %(file_)s
+username = %(user)s
+password = %(password)s
+chmod = %(chmod)s
 """
 
 RPC_TEMPLATE = """

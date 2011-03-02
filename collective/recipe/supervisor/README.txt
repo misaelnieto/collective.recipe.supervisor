@@ -20,6 +20,16 @@ sections
 plugins
     Extra eggs you want the recipe to install. ie: superlance
         
+http-socket
+    "inet" or "unix" socket to use for http administration. Defaults to "inet".
+
+file
+    A path to a UNIX domain socket (e.g. /tmp/supervisord.sock) on which
+    supervisor will listen for HTTP/XML-RPC requests.
+
+chmod
+    Change the UNIX permission mode bits of the UNIX domain socket to this value at startup.
+
 port
     The port nummber supervisord listen to. ie: 9001. Can be given as host:port
     like 127.0.0.1:9001. Defaults to 127.0.0.1:9001
@@ -172,12 +182,10 @@ Chris Mc Donough said::
 Running the buildout gives us::
 
     >>> print system(buildout)
+    Getting distribution for 'zc.recipe.egg'.
     ...
     Installing supervisor.
-    Getting distribution for 'superlance'.
     ...
-    Getting distribution for 'supervisor'.
-     ...
     Generated script '/sample-buildout/bin/httpok'.
     Generated script '/sample-buildout/bin/memmon'.
     Generated script '/sample-buildout/bin/crashmail'.
@@ -386,3 +394,32 @@ that this is also set in the control script:
     <BLANKLINE>
     if __name__ == '__main__':
         supervisor.supervisorctl.main(sys.argv[1:])
+
+It is possible to run http server through unix socket
+(`http://supervisord.org/configuration.html#unix-http-server-section-values`_) rather than tcp:
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = supervisor
+    ... index = http://pypi.python.org/simple/
+    ...
+    ... [supervisor]
+    ... recipe = collective.recipe.supervisor
+    ... http-socket = unix
+    ... user = foobar
+    ... password = foobar
+    ... file = /tmp/supervisor.sock
+    ... programs =
+    ...       50 other ${buildout:bin-directory}/other [-n 100] /tmp
+    ... """)
+    >>> _ = system(buildout)
+    >>> cat('parts', 'supervisor', 'supervisord.conf') #doctest: +REPORT_NDIFF
+    <BLANKLINE>
+    ...
+    [unix_http_server]
+    file = /tmp/supervisor.sock
+    username = foobar
+    password = foobar
+    chmod = 0700
+    ...

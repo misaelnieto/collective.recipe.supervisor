@@ -1,6 +1,9 @@
 0.15dev (unreleased)
 =================
 
+- Added support for unix_http_server additionally to inet_http_server
+  [ielectric - sponsored by Hexagon IT]
+
 0.14 (2010-12-10)
 =================
 
