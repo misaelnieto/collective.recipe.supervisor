@@ -395,8 +395,8 @@ that this is also set in the control script:
     if __name__ == '__main__':
         supervisor.supervisorctl.main(sys.argv[1:])
 
-It is possible to run http server through unix socket
-(`http://supervisord.org/configuration.html#unix-http-server-section-values`_) rather than tcp:
+It is possible to run http server through `unix socket
+<http://supervisord.org/configuration.html#unix-http-server-section-values>`_ rather than tcp:
 
     >>> write('buildout.cfg',
     ... """
