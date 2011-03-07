@@ -69,11 +69,15 @@ class Recipe(object):
                 raise ValueError("http-socket only supports values inet or unix.")
 
         # supervisorctl
-        if ':' in port:
-            default_serverhost = port
-        else:
-            default_serverhost = 'localhost:%s' % port
-        serverurl = self.options.get('serverurl', 'http://%s' % default_serverhost)
+        if http_socket == 'inet':
+            if ':' in port:
+                default_serverhost = port
+            else:
+                default_serverhost = 'localhost:%s' % port
+            default_serverhost = 'http://%s' % default_serverhost
+        elif http_socket == 'unix':
+            default_serverhost = 'unix://%s' % file_
+        serverurl = self.options.get('serverurl', default_serverhost)
         if 'ctl' in sections:
             config_data += CTL_TEMPLATE % locals()
 

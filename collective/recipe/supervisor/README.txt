@@ -186,10 +186,6 @@ Running the buildout gives us::
     ...
     Installing supervisor.
     ...
-    Generated script '/sample-buildout/bin/httpok'.
-    Generated script '/sample-buildout/bin/memmon'.
-    Generated script '/sample-buildout/bin/crashmail'.
-    Generated script '/sample-buildout/bin/supervisord'.
     Generated script '/sample-buildout/bin/supervisorctl'.
     <BLANKLINE>
 
@@ -417,9 +413,17 @@ It is possible to run http server through `unix socket
     >>> cat('parts', 'supervisor', 'supervisord.conf') #doctest: +REPORT_NDIFF
     <BLANKLINE>
     ...
+    <BLANKLINE>
     [unix_http_server]
     file = /tmp/supervisor.sock
     username = foobar
     password = foobar
     chmod = 0700
+    <BLANKLINE>
+    [supervisorctl]
+    serverurl = unix:///tmp/supervisor.sock
+    username = foobar
+    password = foobar
+    <BLANKLINE>
     ...
+    <BLANKLINE>

@@ -1,5 +1,11 @@
-0.16dev (unreleased)
+0.17dev (unreleased)
 ====================
+
+0.16 (2011-03-07)
+=================
+
+- Fix supervisorctl to use unix_http_server if used
+  [Domen Kožar, NiteoWeb. Work sponsored by Hexagon IT]
 
 0.15 (2011-03-05)
 =================
