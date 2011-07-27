@@ -8,3 +8,4 @@
 - Domen Kozar, Contributor
 - Lucie Lejard, Contributor
 - Servilio Afre Puentes, Contributor
+- Juan A. Diaz (nueces), Contributor

@@ -158,6 +158,28 @@ class Recipe(object):
                                 serverurl = serverurl,
                            )
 
+        # groups
+        groups = [g for g in self.options.get('groups', '').splitlines() if g]
+
+        pattern = re.compile("(?P<priority>\d+)"
+                             "\s+"
+                             "(?P<group>[^\s]+)"
+                             "\s+"
+                             "(?P<programs>[^\s]+)")
+
+        for group in groups:
+            match = pattern.match(group)
+            if not match:
+                raise ValueError("Group line incorrect: %s" % group)
+
+            parts = match.groupdict()
+
+            config_data += GROUP_TEMPLATE % \
+                           dict(priority = parts.get('priority'),
+                                group = parts.get('group'),
+                                programs = parts.get('programs'),
+                           )
+
         # include
         files = [f for f in self.options.get('include', '').splitlines() if f]
         if files:
@@ -279,6 +301,12 @@ command = %(command)s %(args)s
 events = %(events)s
 process_name=%(name)s
 environment=SUPERVISOR_USERNAME='%(user)s',SUPERVISOR_PASSWORD='%(password)s',SUPERVISOR_SERVER_URL='%(serverurl)s'
+"""
+
+GROUP_TEMPLATE = """
+[group:%(group)s]
+programs = %(programs)s
+priority = %(priority)s
 """
 
 INCLUDE_TEMPLATE = """                                                                

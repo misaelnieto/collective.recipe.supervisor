@@ -1,5 +1,7 @@
 0.17dev (unreleased)
 ====================
+- Added support for process groups
+  [nueces]
 
 0.16 (2011-03-07)
 =================

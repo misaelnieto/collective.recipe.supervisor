@@ -125,7 +125,14 @@ eventlisteners
     every 60 seconds and restarts as needed could look like:
     
        MemoryMonitor TICK_60 ${buildout:bin-directory}/memmon [-p process_name=200MB]
-
+    
+groups
+   A list of programs that become part of a group. One per line.
+   The format of a line is as follow:
+    
+       priority group_name program_names
+    
+   The programs_name is a comma-separated list of program names.
     
 env-path
     The environment variable PATH, e.g. /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
@@ -167,6 +174,9 @@ We'll start by creating a buildout that uses the recipe::
     ... eventlisteners =
     ...       Memmon TICK_60 ${buildout:bin-directory}/memmon [-p instance1=200MB]
     ...       HttpOk TICK_60 ${buildout:bin-directory}/httpok [-p site1 -t 20 http://localhost:8080/]
+    ... groups =
+    ...       10 services zeo,instance1
+    ...       20 others other,other2,other3
     ... """)
 
 Chris Mc Donough said::
@@ -309,7 +319,14 @@ now, get a look to the generated supervisord.conf file::
     events = TICK_60
     process_name=HttpOk
     environment=SUPERVISOR_USERNAME='mustapha',SUPERVISOR_PASSWORD='secret',SUPERVISOR_SERVER_URL='http://supervisor.mustap.com'
-
+    <BLANKLINE>
+    [group:services]
+    programs = zeo,instance1
+    priority = 10
+    <BLANKLINE>
+    [group:others]
+    programs = other,other2,other3
+    priority = 20
 
 
 and if we look to generated supervisord script we will see that the 
