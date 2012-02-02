@@ -42,6 +42,16 @@ class Recipe(object):
         umask = self.options.get('umask', '022')
         nodaemon = self.options.get('nodaemon', 'false')
         nocleanup = self.options.get('nocleanup', 'false')
+        
+        def option_setting(options, key, supervisor_key):
+            return options.get(key, False) \
+                and ('%s = %s' % (supervisor_key, options.get(key))) \
+                or ''
+
+        supervisord_user = option_setting(self.options, 'supervisord-user', 'user')
+        supervisord_directory = option_setting(self.options, 'supervisord-directory', 'directory')
+        supervisord_environment = option_setting(self.options, 'supervisord-environment', 'environment')
+
         config_data = CONFIG_TEMPLATE % locals()
 
         # environment PATH variable
@@ -252,6 +262,9 @@ pidfile = %(pidfile)s
 umask = %(umask)s
 nodaemon = %(nodaemon)s
 nocleanup = %(nocleanup)s
+%(supervisord_user)s
+%(supervisord_directory)s
+%(supervisord_environment)s
 """
 
 PATH_TEMPLATE = """\

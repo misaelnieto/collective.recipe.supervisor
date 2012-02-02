@@ -43,6 +43,25 @@ password
 supervisord-conf
     Full path to where the recipe puts the supervisord configuration file. 
     Defaults to ${buildout:directory}/parts/${name}/supervisord.conf
+    
+supervisord-user
+    If supervisord is run as the root user, switch users to this UNIX user 
+    account before doing any meaningful processing. This value has no effect 
+    if supervisord is not run as root.
+    
+supervisord-directory
+    When supervisord daemonizes, switch to this directory. This option can 
+    include the value %(here)s, which expands to the directory in which the 
+    supervisord configuration file was found.
+    
+supervisord-environment
+    A list of key/value pairs in the form KEY=val,KEY2=val2 that will be placed
+    in the supervisord process’ environment (and as a result in all of its 
+    child process’ environments). This option can include the value %(here)s,
+    which expands to the directory in which the supervisord configuration file
+    was found. Note that subprocesses will inherit the environment variables of
+    the shell used to start supervisord except for the ones overridden here and
+    within the program’s environment configuration stanza.
 
 childlogdir
     The full path of the directory where log files of processes managed by
